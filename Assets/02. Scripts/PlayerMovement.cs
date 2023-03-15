@@ -27,7 +27,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        Rotate();
         Move(playerInput.moveInput);
     }
 
@@ -47,8 +46,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Rotate()
     {
-        var targetRotation = followCam.transform.eulerAngles.y;
-        transform.eulerAngles = Vector3.up * targetRotation;
+        //var targetRotation = followCam.transform.eulerAngles;
+        //transform.eulerAngles = Vector3.up * targetRotation;
     }
 
      private void UpdateAnimation(Vector2 moveInput)
