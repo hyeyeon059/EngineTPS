@@ -22,8 +22,7 @@ public class PlayerShooter : MonoBehaviour
         }
         else if (playerInput.reload)
         {
-            //gun.Reload()
-            //재장전 애니메이션 실행
+            gun.Reload();
         }
     }
 }
