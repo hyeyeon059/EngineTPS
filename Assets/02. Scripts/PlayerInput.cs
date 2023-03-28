@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
@@ -13,6 +14,15 @@ public class PlayerInput : MonoBehaviour
     public bool fire { get; internal set; }
     public bool reload { get; internal set; }
 
+    private Camera mainCam;
+
+    private void Awake()
+    {
+        mainCam = Camera.main;
+    }
+
+    public Action OnFirePressed = null;
+
     void Start()
     { 
         
@@ -23,7 +33,30 @@ public class PlayerInput : MonoBehaviour
         moveInput = new Vector2(Input.GetAxis(moveAxisName), Input.GetAxis(rotateAxisName));
         if (moveInput.sqrMagnitude > 1)
             moveInput = moveInput.normalized;
+
         fire = Input.GetButtonDown(fireButtonName);
         reload = Input.GetButtonDown(reloadButtonName);
+
+        if(fire)
+        {
+            OnFirePressed?.Invoke();
+        }
+    }
+
+    public bool GetMouseWorldPosition(out Vector3 point)
+    {
+        Ray cameraRay = mainCam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        float depth = mainCam.farClipPlane;
+
+        point = Vector3.zero; 
+
+        if (Physics.Raycast(cameraRay, out hit, depth))
+        {
+            point = hit.point;
+            return true;
+        }
+        else
+            return false;
     }
 }

@@ -13,6 +13,10 @@ public class Gun : MonoBehaviour
     }
     public State state { get; private set; }
 
+    private AudioSource audioSource;
+    public AudioClip shootClip;
+    public AudioClip reloadClip;
+
     public Transform firePosition; //총알나가는 위치와 방향
     public ParticleSystem muzzleFlashEffect;
     public float bulletLineEffectTime = 0.03f;
@@ -30,16 +34,28 @@ public class Gun : MonoBehaviour
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         bulletLineRenderer = GetComponent<LineRenderer>();
         bulletLineRenderer.positionCount = 2;
     }
 
+    void Start()
+    {
+        magAmmo = magCapacity;
+        state = State.Ready;
+        lastFireTime = 0f;
+    }
+
     IEnumerator ShotEffect(Vector3 hitPosition)
     {
+        audioSource.clip = shootClip;
+        audioSource.Play();
+
         muzzleFlashEffect.Play();
         bulletLineRenderer.SetPosition(0, firePosition.position);
         bulletLineRenderer.SetPosition(1, hitPosition);
         bulletLineRenderer.enabled = true;
+
         yield return new WaitForSeconds(bulletLineEffectTime);
 
         bulletLineRenderer.enabled = false;
@@ -47,6 +63,9 @@ public class Gun : MonoBehaviour
 
     public IEnumerator ReloadRoutine()
     {
+        audioSource.clip = reloadClip;
+        audioSource.Play();
+         
         state = State.Reloading;
         yield return new WaitForSeconds(reloadTime);
         magAmmo = magCapacity;
@@ -70,11 +89,15 @@ public class Gun : MonoBehaviour
 
         if(Physics.Raycast(firePosition.position, firePosition.right * -1, out hit, fireDistance))
         {
-            var target = hit.collider.GetComponent<Damageable>();
+            var target = hit.collider.GetComponent<Idamageable>();
 
             if (target != null)
             {
                 target.OnDamage(damage, hit.point, hit.normal);
+            }
+            else
+            {
+                EffectManager.Instance.PlayHitEffect(hit.point, hit.normal, hit.transform);
             }
             hitPosition = hit.point;
         }
@@ -96,17 +119,5 @@ public class Gun : MonoBehaviour
             return false;
         StartCoroutine(ReloadRoutine());
         return true;
-    }
-
-    void Start()
-    {
-        magAmmo = magCapacity;
-        state = State.Ready;
-        lastFireTime = 0f;
-    }
-
-    void Update()
-    {
-        
     }
 }

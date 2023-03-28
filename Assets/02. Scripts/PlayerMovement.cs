@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        Rotate();
+        //Rotate();
         Move(playerInput.moveInput);
     }
 
@@ -49,6 +49,25 @@ public class PlayerMovement : MonoBehaviour
     {
         var targetRotation = followCam.transform.eulerAngles.y;
         transform.eulerAngles = Vector3.up * targetRotation;
+    }
+
+    public void SetRotation()
+    {
+        Vector3 target;
+        bool isHit = playerInput.GetMouseWorldPosition(out target);
+
+        if(isHit)
+        {
+            Vector3 dir = target - transform.position;
+            dir.y = 0;
+            transform.rotation = Quaternion.LookRotation(dir.normalized); 
+
+        }
+        Vector3 v = target - transform.position;
+
+        float degree = Mathf.Atan2(v.x, v.z) * Mathf.Rad2Deg;
+        float rot = Mathf.LerpAngle(transform.eulerAngles.y, degree, Time.deltaTime);
+        transform.eulerAngles = new Vector3(0, rot, 0);
     }
 
      private void UpdateAnimation(Vector2 moveInput)
