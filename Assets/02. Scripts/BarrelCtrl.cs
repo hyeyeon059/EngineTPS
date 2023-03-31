@@ -23,7 +23,9 @@ public class BarrelCtrl : MonoBehaviour, Idamageable
 
     public void OnDamage(float damage, Vector3 hitPosition, Vector3 hitNormal)
     {
-        if(++hitCnt == 3)
+        EffectManager.Instance.PlayHitEffect(hitPosition, hitNormal);
+
+        if (++hitCnt == 3)
             ExpBarrel();
         else
             AttackBarrel(damage, hitNormal);
